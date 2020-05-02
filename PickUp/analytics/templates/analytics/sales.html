@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block javascript %}
+
+<script>
+
+$(document).ready(function(){
+    function renderChart(id, data, labels){
+        var ctx = $('#' + id)
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Sales',
+                        data: data,
+                       backgroundColor: 'rgba(0, 158, 29, 0.45)',
+                        borderColor:'rgba(0, 158, 29, 1)',
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero:true
+                            }
+                        }]
+                    },
+                    backgroundColor: 'rgba(75, 192, 192, 1)'
+                }
+            });
+    }
+        function getSalesData(id,type){
+            var url = '/analytics/sales/data/'
+        var method = 'GET'
+        var data = {"type":type}
+        $.ajax({
+            url: url,
+            method: method,
+            data: data,
+            success: function(responseData){
+                renderChart(id, responseData.data, responseData.labels)
+            }, error: function(error){
+                $.alert("An error occurred")
+            }
+        })
+        }
+    
+     
+         var chartsToRender = $('.my-render-chart')
+    $.each(chartsToRender, function(index, html){
+            var $this = $(this)
+            if ( $this.attr('id') && $this.attr('data-type')){
+            getSalesData($this.attr('id'),$this.attr('data-type'))
+        }
+        })
+
+
+    })
+    
+        
+ 
+
+
+</script>
+{% endblock %}
+
+{% block content %}
+
+
+<div class='row'>
+    <div class='col-12'>
+        <h1>Sales Data</h1>
+    </div>
+</div>
+
+
+<div class='row'>
+	<div class='col-12'>
+			<h1> Today:</h1>
+	</div>
+    <div class='col'> 
+    	<p>Orders Total: USD {{ today.recent_data.total__sum }}</p>
+
+    	<ol>
+        {% for order in today.recent %}
+        	<li>{{ order.order_id }}
+        	{{ order.total }}
+        	{{ order.updated }}
+        </li>
+        {% endfor %}
+    </ol>
+    </div>
+
+<div class='row'>
+    <div class='col'>
+    	<p>Paid Totals: USD {{ today.paid_orders_data.total__sum }}</p>
+    	<ol>
+        {% for order in today.paid %}
+        	<li>{{ order.order_id }}
+        	{{ order.total }}
+        	{{ order.updated }}</li>
+        {% endfor %}</ol>
+    </div>
+</div>
+
+
+
+
+</div>
+
+
+<div class='row'>
+	<div class='col-12'>
+			<h1> This week:</h1>
+	</div>
+    <div class='col'> 
+    	<p>Orders Total: USD {{ this_week.recent_data.total__sum }}</p>
+
+    	<ol>
+        {% for order in this_week.recent %}
+        	<li>{{ order.order_id }}
+        	{{ order.total }}
+        	{{ order.updated }}
+        </li>
+        {% endfor %}
+    </ol>
+    </div>
+
+<div class='row'>
+    <div class='col'>
+    	<p>Paid Totals: USD {{ this_week.paid_orders_data.total__sum }}</p>
+    	<ol>
+        {% for order in this_week.paid %}
+        	<li>{{ order.order_id }}
+        	{{ order.total }}
+        	{{ order.updated }}</li>
+        {% endfor %}</ol>
+    </div>
+</div>
+</div>
+
+
+
+
+
+<div class='row'>
+	<div class='col-12'>
+			<h1> Previous four weeks:</h1>
+	</div>
+    <div class='col'> 
+    	<p>Orders Total: USD {{ four_weeks.recent_data.total__sum }}</p>
+
+    	<ol>
+        {% for order in four_weeks.recent %}
+        	<li>{{ order.order_id }}
+        	{{ order.total }}
+        	{{ order.updated }}</li>
+        {% endfor %}</ol>
+    </div>
+
+<div class='row'>
+    <div class='col'>
+    	<p>Paid Totals: USD {{ four_weeks.paid_orders_data.total__sum }}</p>
+    	<ol>
+        {% for order in four_weeks.paid %}
+        	<li>{{ order.order_id }}
+        	{{ order.total }}
+        	{{ order.updated }}</li>
+        {% endfor %}</ol>
+    </div>
+</div>
+
+
+</div>
+
+
+
+<div class='row my-5'>
+    <div class='col-12'>
+        <h1>Charts</h1>
+    </div>
+</div>
+<hr/>
+
+<div class='row my-5'>
+    <div class='col-4'>
+        <h3>Today's sales</h3>
+        <hr/>
+        <p>Recent Total: ${{ today.recent_data.total__sum }}</p>
+        <ol>
+
+{% for order in today.recent|slice:":5" %}
+            <li>{{ order.order_id }}
+            {{ order.total }}
+            {{ order.updated }}</li>
+        {% endfor %}
+    </ol>
+        <h3>This week's sales</h3>
+    <hr/>
+        <p>Recent Total: ${{ this_week.recent_data.total__sum }}</p>
+        <ol>
+        	 {% for order in this_week.recent|slice:":5" %}
+            <li>{{ order.order_id }}
+            {{ order.total }}
+            {{ order.updated }}</li>
+        {% endfor %}
+    </ol>
+    </div>
+    <div class='col'>
+    	   <canvas class='my-render-chart' id="thisWeekSales" data-type='week' width="400" height="400"></canvas>
+    </div>
+</div>
+
+
+
+<div class='row'>
+	<div class='col-12'>
+			<h1> Previous four weeks:</h1>
+	</div>
+    <div class='col'> 
+    	<p>Orders Total: USD {{ four_weeks.recent_data.total__sum }}</p>
+    	<p>Paid Totals: USD {{ four_weeks.paid_orders_data.total__sum }}</p>
+
+     <div class='col'>
+    	   <canvas class='my-render-chart' id="fourWeekSales" data-type='4weeks' width="400" height="400"></canvas>
+    </div>
+</div>
+
+
+</div>
+
+
+{% endblock %}

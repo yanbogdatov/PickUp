@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+
+    <div class='text-center'>
+    <h1>Hey, {{user.username}}!</h1>
+    <h1>Write some feedback</h1>
+    </div>
+    <div class='container'>
+     <div class='row'>
+      <div class='col'>
+        <div class='col-sm-6 col-12'>
+
+          <form method='POST'> {% csrf_token %}
+          {{form}}
+          <button type='submit' class='btn-default'>Submit</button>
+          </form>
+
+
+
+         
+        </div>
+      </div>
+     </div> 
+    </div>
+{% endblock %}
+ 
